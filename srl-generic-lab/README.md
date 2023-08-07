@@ -20,13 +20,13 @@ The Leaf and Spine notes are running containerized SR Linux (7220 IXR D3L) NOS a
 
 See below the connections.
 
-<p align="center"> <img src="https://github.com/hansthienpondt/SReXperts/assets/17744051/bb4c5076-2375-405d-a2b2-c1f8c1a1cf57" height="600"> </p>
+<p align="center"> <img src="https://github.com/aaakpinar/NCE/assets/17744051/52fa00b0-f979-402d-bc69-b15f4b926256" height="600"> </p>
 
 Every node in the data center fabric is configured with eBGP as underlay routing protocol. Also iBGP EVPN for overlay ip-vrf and mac-vrf network instances.
 
 Below network instances and client connections are pre-configured.
 
-<p align="center"> <img src="https://github.com/hansthienpondt/SReXperts/assets/17744051/21f38868-8f27-4bf5-984a-b9a48f794525" height="400"> </p>
+<p align="center"> <img src="https://github.com/aaakpinar/NCE/assets/17744051/45b4cf0b-9cde-457f-8744-64cf4484d95c" height="400"> </p>
 
 
 ## Deploying the lab
