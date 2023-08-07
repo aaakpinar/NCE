@@ -20,13 +20,13 @@ The Leaf and Spine nodes are running containerized Nokia SR Linux (7220 IXR D3L)
 
 Topology diagram:
 
-![pic](https://github.com/hansthienpondt/SReXperts/assets/17744051/1724972b-395c-470b-8f8c-1356e4afe914)
+![pic](https://github.com/aaakpinar/NCE/assets/17744051/5cc58f6a-4358-4724-a37a-d2aa4ae5f5e0)
 
 Every node in the data center fabric is configured with eBGP as an underlay routing protocol. iBGP EVPN used to setup overlay ip-vrf and mac-vrf services.
 
 Hosts are connected to the respective overlay services as per the diagram below:
 
-![image](https://github.com/hansthienpondt/SReXperts/assets/17744051/a7088c77-f7af-409d-acbe-f87341f1e802)
+![image](https://github.com/aaakpinar/NCE/assets/17744051/c12a44bd-1386-4048-9b28-450c4fd9b828)
 
 ## Deploying the lab
 
@@ -48,7 +48,7 @@ Once the lab is deployed, you can access the network elements through the expose
 
 For access via a VM, use the addresses presented by containerlab at the end of the deployment process or use the values from the lab file. You can always refresh yourself on which nodes are available by running `sudo containerlab inspect --all`.
 
-If you wish to have direct external access from your machine, use the public IP address of the VM and the external port numbers as per the table below:
+If you wish to have direct external access from your machine, use the public IP address of you machine and the external port numbers as per the table below:
 
 | Node   | Direct SSH           | gNMI       | JSON-RPC          | User/Pass            |
 | ------ | -------------------- | ---------- | ----------------- | -------------------- |
@@ -63,7 +63,7 @@ If you wish to have direct external access from your machine, use the public IP 
 | h3     | `ssh root@IP:51009`  |            |                   | `root`:`clab`        |
 | h4     | `ssh root@IP:51010`  |            |                   | `root`:`clab`        |
 
-> If you prefer to connect nodes from the lab VM use default port numbers of the protocols.
+> If you prefer to connect nodes locally, use default port numbers of the protocols.
 
 Optionally, you may source the `srl-generic.rc` file to create convenient bash aliases to access nodes in a quick way; e.g. `l1` instead of `ssh admin@clab-srl-generic-leaf1`
 
@@ -73,7 +73,7 @@ Optionally, you may source the `srl-generic.rc` file to create convenient bash a
 
 The eBGP is configured on the inter-switch links between Spine and Leaf routers.
 
-![pic](https://github.com/hansthienpondt/SReXperts/assets/17744051/c5ef8017-b902-4cb9-aa83-82cdd2b0e899)
+![pic](https://github.com/aaakpinar/NCE/assets/17744051/73f3238b-3990-4672-9636-b9f2bac16cc9)
 
 Connect to nodes and check the inter-switch links, eBGP sessions, AS numbers of Leaf and Spine, underlay network reachability between nodes by pinging the system IP addresses.
 
@@ -100,7 +100,7 @@ And the state information:
 
 EVPN use MP-BGP as control plane protocol between the tunnel endpoints. Typically, route-reflectors(RRs) are configured for the scalability. In this lab, spine routers are configured as RRs. All the leaf routers are peering with the spine routers for iBGP EVPN routes.
 
-![pic](https://github.com/hansthienpondt/SReXperts/assets/17744051/4931dbd1-1e40-4c6d-b805-3b03dc86a240)
+![image](https://github.com/aaakpinar/NCE/assets/17744051/3e41e5a1-39a8-4ecd-9b79-56d0a1f2a9e4)
 
 Connect to the nodes and check RR configuration on spines, iBGP EVPN sessions across the data center fabric.
 
@@ -120,7 +120,7 @@ Connect to the SR Linux nodes to check the EVPN service building blocks; IP-VRF 
 
 Look again at the overlay topology for this part:
 
-![pic](https://github.com/hansthienpondt/SReXperts/assets/17744051/d5a3661c-e1af-4526-adf3-5226d377a994)
+![image](https://github.com/aaakpinar/NCE/assets/17744051/47251bcf-93b9-4d03-b043-50a7c247812b)
 
 Some useful commands:
 
