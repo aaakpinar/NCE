@@ -1,0 +1,30 @@
+all:
+  children:
+    linux:
+      hosts:
+        clab-my_dc1-h1:
+          ansible_host: 172.20.0.4
+        clab-my_dc1-h2:
+          ansible_host: 172.20.0.5
+        clab-my_dc1-h3:
+          ansible_host: 172.20.0.3
+        clab-my_dc1-h4:
+          ansible_host: 172.20.0.2
+    srl:
+      hosts:
+        clab-my_dc1-bl1:
+          ansible_host: 172.20.0.101
+        clab-my_dc1-bl2:
+          ansible_host: 172.20.0.102
+        clab-my_dc1-l1:
+          ansible_host: 172.20.0.11
+        clab-my_dc1-l2:
+          ansible_host: 172.20.0.12
+        clab-my_dc1-l3:
+          ansible_host: 172.20.0.13
+        clab-my_dc1-l4:
+          ansible_host: 172.20.0.14
+        clab-my_dc1-s1:
+          ansible_host: 172.20.0.21
+        clab-my_dc1-s2:
+          ansible_host: 172.20.0.22

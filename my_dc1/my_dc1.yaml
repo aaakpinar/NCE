@@ -1,0 +1,69 @@
+name: my_dc1
+
+topology:
+  defaults:
+    kind: srl
+  kinds:
+    srl:
+      type: ixrd3
+      image: ghcr.io/nokia/srlinux:latest
+    linux:
+      image: akpinar/alpine:latest 
+  nodes:
+    bl1:
+      kind: srl
+      mgmt-ipv4: 172.20.0.101
+    bl2:
+      kind: srl
+      mgmt-ipv4: 172.20.0.102
+    s1:
+      kind: srl
+      mgmt-ipv4: 172.20.0.21
+    s2:
+      kind: srl
+      mgmt-ipv4: 172.20.0.22
+    l1:
+      kind: srl
+      mgmt-ipv4: 172.20.0.11
+    l2:
+      kind: srl
+      mgmt-ipv4: 172.20.0.12
+    l3:
+      kind: srl
+      mgmt-ipv4: 172.20.0.13
+    l4: 
+      kind: srl
+      mgmt-ipv4: 172.20.0.14
+    h1:
+      kind: linux
+    h2:
+      kind: linux      
+    h3:
+      kind: linux
+    h4:
+      kind: linux
+
+  links:
+    - endpoints: ["s1:e1-33", "bl1:e1-3"]
+    - endpoints: ["s1:e1-34", "bl2:e1-3"]
+    - endpoints: ["s2:e1-33", "bl1:e1-4"]
+    - endpoints: ["s2:e1-34", "bl2:e1-4"]
+
+    - endpoints: ["s1:e1-1", "l1:e1-3"]
+    - endpoints: ["s1:e1-2", "l2:e1-3"]
+    - endpoints: ["s1:e1-3", "l3:e1-3"]
+    - endpoints: ["s1:e1-4", "l4:e1-3"]
+    - endpoints: ["s2:e1-1", "l1:e1-4"]
+    - endpoints: ["s2:e1-2", "l2:e1-4"]
+    - endpoints: ["s2:e1-3", "l3:e1-4"]
+    - endpoints: ["s2:e1-4", "l4:e1-4"]
+    
+    - endpoints: ["l1:e1-10", "h1:eth1"]
+    - endpoints: ["l2:e1-10", "h2:eth1"]
+    - endpoints: ["l3:e1-10", "h3:eth1"]
+    - endpoints: ["l4:e1-10", "h4:eth1"]
+
+mgmt: 
+  network: srl-mgmt
+  ipv4-subnet: 172.20.0.0/24
+  ipv6-subnet: 2001:172:20::/80   
