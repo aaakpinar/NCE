@@ -20,7 +20,8 @@ The Leaf and Spine nodes are running containerized Nokia SR Linux (7220 IXR D3L)
 
 Topology diagram:
 
-![pic](https://github.com/aaakpinar/NCE/assets/17744051/5cc58f6a-4358-4724-a37a-d2aa4ae5f5e0)
+![image](https://github.com/aaakpinar/NCE/assets/17744051/6545fa68-7b78-4de1-a6f9-7ee291efc9a8)
+
 
 Every node in the data center fabric is configured with eBGP as an underlay routing protocol. iBGP EVPN used to setup overlay ip-vrf and mac-vrf services.
 
