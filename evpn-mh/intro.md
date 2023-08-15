@@ -22,7 +22,7 @@ EVPN provides multi-homing with the Ethernet Segments (ES). ES simply defines al
 
 This tutorial will show how to configure multi-homing for a CE connected to multiple PEs in an EVPN-based SR Linux fabric.
 
-The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine hosts(CEs). A multi-homed CE is connected to leaf1, while another CE is connected to leaf3 for testing purposes.
+The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine Linux hosts(CEs). A multi-homed CE is connected to leaf1, while another CE is connected to leaf3 for testing purposes.
 
 <div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:0,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-fabric.svg&quot;}"></div>
 
@@ -63,13 +63,13 @@ LAG is required for the all-active mode but can be skipped for single-active cas
 
 In this example, a LAG is created for an all-active multi-homing mode. The target configuration between a multihomed CE and PEs is illustrated below.
 
-## IMAGE LAG
+**IMAGE LAG HERE**
 
 The configuration snippet below shows a LAG with a subinterface and LACP parameters of it.
 
 ```
-A:leaf1# info interface lag1
-    interface lag1 {
+enter candidate
+    /interface lag1 {
         admin-state enable
         vlan-tagging true
         subinterface 1 {
@@ -102,8 +102,8 @@ The `lag-type` can be LACP or static. It is configured as LACP here, so its para
 Then, the physical interface(s) must be associated with the LAG. 
 
 ```
-A:leaf1# info interface ethernet-1/11
-    interface ethernet-1/11 {
+enter candidate
+    /interface ethernet-1/11 {
         admin-state enable
         ethernet {
             aggregate-id lag1
@@ -113,13 +113,13 @@ A:leaf1# info interface ethernet-1/11
 
 The LAG and interface configurations must be done in all PEs that provide multi-homing to the CE.
 
-## Ethernet Segment Configuration
+### Ethernet Segment Configuration
 
 In SR Linux, the `ethernet-segments` are configured under [ system network-instance protocols evpn ] context.
 
 ```
---{ running }--[ system network-instance protocols ]--
-A:leaf1# info
+enter candidate
+/system network-instance protocols 
     evpn {
         ethernet-segments {
             bgp-instance 1 {
@@ -143,9 +143,86 @@ An `ethernet-segment` is created with a name (ES-1) under the BGP-instance 1. Th
 
 Besides the ethernet segments, the `bgp-vpn` with `bgp-instance 1` is configured to get the ES routes' BGP information (RT/RD).
 
-## MAC-VRF Interface Configuration
+### MAC-VRF Interface Configuration
 
-Typically, the L2 multi-homed LAG needs to be associated with a MAC-VRF. The whole MAC-VRF with VXLAN configuration is covered [here](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf).
+Typically, an L2 multi-homed LAG needs to be associated with a MAC-VRF.
+
+```
+enter candidate
+    /network-instance mac-vrf-1 {
+        interface lag1.1 {
+        }
+    }
+```
+
+The whole MAC-VRF with VXLAN configuration is covered [here](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf).
+
+With this, an all-active EVPN-MH configuration is completed.
+
+Let's see the configuration example on the CE side.
+
+## CE (Alpine Linux) Configuration
+
+The ce2 is configured with a bond0 with slave interfaces eth1 and eth2. Similar to SR Linux part, it's configured with LACP (802.3ad).
+
+The configuration file is /etc/network/interfaces and an example configuration snippet is below:
+
+```
+auto bond0
+auto eth1
+auto eth2
+
+iface eth1 inet manual
+bond-master bond0
+mtu 1400
+
+iface eth2 inet manual
+bond-master bond0
+mtu 1400
+
+iface bond0 inet static
+address 100.101.1.11
+netmask 255.255.255.0
+bond-mode 802.3ad
+bond-xmit-hash-policy layer3+4
+bond-miimon 300
+mtu 1400
+```
+
+Similarly, ce2 is configured with an IP address but without bonding:
+
+```
+auto eth1
+iface eth1 inet static
+address 100.101.1.14
+netmask 255.255.255.0
+mtu 1400
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
