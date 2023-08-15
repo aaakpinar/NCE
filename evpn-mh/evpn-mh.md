@@ -32,6 +32,13 @@ The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine Linux hosts(CEs).
 
 ## Lab deployment
 
+
+
+
+
+
+
+
 ## EVPN Multi-homing Terminology
 
 Before diving into the hands-on, I'll mention the terms that would help better understand the configurations.
@@ -201,6 +208,10 @@ mtu 1400
 ```
 
 ## Verifying the Configurations
+
+
+
+
 
 
 
