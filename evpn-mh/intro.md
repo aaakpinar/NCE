@@ -40,13 +40,12 @@ Before diving into the hands-on, I'll mention the terms that would help better u
 ![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-all-active.svg)
   
 + **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. Each ES has a unique identifier (ESI) advertised via EVPN. It is used for load-balancing, preventing loops and duplicates for multi-homed workloads.
-![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/esi.svg)
 
-Sub-interfaces of these physical interfaces can be attached to different MAC-VRFs.
+![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/esi.svg)
 
 + **Link Aggregation Group (LAG):** A LAG is needed for all-active but optional for single-active multi-homing.
 
-## EVPN Multi-homing Configurations
+## SR Linux Multi-Homing Configurations
 
 The below items are to be configured in all PEs that provide multi-homing to a CE.
 
@@ -189,7 +188,7 @@ bond-miimon 300
 mtu 1400
 ```
 
-Similarly, ce2 is configured with an IP address but without bonding:
+Similarly, ce2 is configured with an IP address but, without bonding:
 
 ```
 auto eth1
@@ -199,7 +198,7 @@ netmask 255.255.255.0
 mtu 1400
 ```
 
-
+## Verifying the Configurations
 
 
 
