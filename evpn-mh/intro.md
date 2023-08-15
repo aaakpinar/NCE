@@ -22,16 +22,47 @@ EVPN provides multi-homing with the Ethernet Segments (ES). ES simply defines al
 
 This tutorial will show how to configure multi-homing for a CE connected to multiple PEs in an EVPN-based SR Linux fabric.
 
-The lab consists of a spine and 3 leaf(PEs) routers, and two Alpine hosts(CEs). A multi-homed CE is connected to leaf1 and 3, while another CE is connected to leaf3 for testing purposes.
+The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine hosts(CEs). A multi-homed CE is connected to leaf1, while another CE is connected to leaf3 for testing purposes.
 
 <div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:0,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-fabric.svg&quot;}"></div>
 
-
 ![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-fabric.svg)
 
+## EVPN Multi-homing Terminology
+
+Before diving into the hands-on, I'll mention the terms that would help better understand the configurations.
+
++ **MAC-VRF:** A broadcast domain in SR Linux.
+  >_[L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf) simply explains it with example configurations and a use case._ 
++ **Multi-homing Modes:** There are two modes defined by the standard; single-active and all-active. The single-active has only one active link while all-active uses all links and provides load balancing.
+![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-all-active.svg)
+  
++ **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. Each ES has a unique identifier (ESI) known EVPN network-wide which used to prevent duplication.
+![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/esi.svg)
+
+Sub-interfaces of these physical interfaces can be attached to different MAC-VRFs.
+
++ **Link Aggregation Group (LAG):** A LAG is needed for all-active but optional for single-active multi-homing.
+
+## EVPN Multi-homing Configurations
+
+The below items to be configured in all PEs that provide multi-homing to a CE.
+
+A LAG and member interfaces
+Ethernet segment
+MAC-VRF to interface association
+
+The lab is pre-configured with underlay and EVPN routing with BGP, also with a MAC-VRF for CE to CE L2 communication.
+
+### LAG Configuration
 
 
-The two servers are connected to the leafs via an L2 interface. Service-wise the servers will appear to be on the same L2 network by means of the deployed EVPN Layer 2 service.
+
+
+
+
+
+
 
 <div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:1,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/quickstart.drawio&quot;}"></div>
 
