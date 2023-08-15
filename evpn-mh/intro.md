@@ -33,8 +33,8 @@ The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine hosts(CEs). A mul
 Before diving into the hands-on, I'll mention the terms that would help better understand the configurations.
 
 + **MAC-VRF:** A broadcast domain in SR Linux.
-  >_[L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf) simply explains it with example configurations and a use case._ 
-+ **Multi-homing Modes:** There are two modes defined by the standard; single-active and all-active. The single-active has only one active link while all-active uses all links and provides load balancing.
+
++ **Multi-homing Modes:** There are two modes defined by the standard; single-active and all-active. The single-active has only one active link while all-active uses all links and provides load balancing. An example of all-active multi-homing will be covered in this tutorial.
 ![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-all-active.svg)
   
 + **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. Each ES has a unique identifier (ESI) known EVPN network-wide which used to prevent duplication.
@@ -52,12 +52,54 @@ A LAG and member interfaces
 Ethernet segment
 MAC-VRF to interface association
 
-The lab is pre-configured with underlay and EVPN routing with BGP, also with a MAC-VRF for CE to CE L2 communication.
+The lab is pre-configured with underlay, EVPN routing with BGP, and a MAC-VRF for CE-to-CE L2 communication.
+  >Check out _[L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf) to learn more about the configured part!_ 
 
 ### LAG Configuration
 
+LAG is required for the all-active mode but can be skipped for single-active cases.
+
+In this example, a LAG is created for an all-active multi-homing mode. The target configuration between a multihomed CE and PEs is illustrated below.
+
+## IMAGE LAG
+
+The configuration snippet below shows a LAG with a subinterface and LACP parameters of it.
+
+```
+A:leaf1# info interface lag1
+    interface lag1 {
+        admin-state enable
+        vlan-tagging true
+        subinterface 1 {
+            type bridged
+            vlan {
+                encap {
+                    untagged {
+                    }
+                }
+            }
+        }
+        lag {
+            lag-type lacp
+            member-speed 10G
+            lacp {
+                interval SLOW
+                lacp-mode ACTIVE
+                admin-key 11
+                system-id-mac 00:00:00:00:00:11
+                system-priority 11
+            }
+        }
+    }
+```
+
+The lag1 is created with the `vlan-tagging` enabled so that this LAG can have multiple subinterfaces with different VLAN tags. In this way, each subinterface can be attached to a different MAC-VRF.
+
+The `lag-type` can be LACP or static. Here it is configured as LACP, so its parameters must match in all nodes; leaf1 and leaf2 in this example.
 
 
+
+Here 
 
 
 
