@@ -53,7 +53,7 @@ Before diving into the hands-on, I'll mention the terms that would help better u
 
 + **Link Aggregation Group (LAG):** A LAG is required for all-active but optional for single-active multi-homing.
 
-+ **MAC-VRF:** A broadcast domain in SR Linux. Interface(s) or LAG must be attached to a MAC-VRF for L2 multi-homing.
++ **MAC-VRF:** It is the L2 network-instance, basically a broadcast domain in SR Linux. Interface(s) or LAG must be attached to a MAC-VRF for L2 multi-homing.
 
 The following procedures are essential to EVPN multi-homing but not a typical configuration item;
 
@@ -72,7 +72,7 @@ The following items must be configured in all PEs that provide multi-homing to a
 + MAC-VRF interface association
 
 The lab is pre-configured with underlay, EVPN routing with BGP, and a MAC-VRF for CE-to-CE L2 communication.
-  >Check out _[L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf) to learn more about the pre-configured part!_ 
+  >See _[L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf) for the details of the pre-configured part!_ 
 
 ### LAG Configuration
 
@@ -172,6 +172,21 @@ enter candidate
     }
 ```
 
+Also, to enable load-balancing to all-active multi-homing segments, set ecmp to the expected number of leaf (PE) that serves the CE, 2 in this example.
+>An ethernet segment can be distrubuted up to 4 PE.
+
+```
+enter candidate
+    /network-instance mac-vrf-1 {
+        protocols {
+        bgp-evpn {
+            bgp-instance 1 {
+                ecmp 2
+            }
+        }
+    }
+```
+
 The whole MAC-VRF with VXLAN configuration is covered [here](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf).
 
 With this, an all-active EVPN-MH configuration is completed.
@@ -216,9 +231,47 @@ netmask 255.255.255.0
 mtu 1400
 ```
 
-## Verifying the Configurations
+## Verifying the Multi-homing
 
+On the PE side, the lag1 was created in both leaf1 and leaf2. Let's see them with these show commands:
 
+```
+A:leaf1# show interface lag1
+==========================================================================================================================================================================
+lag1 is up, speed None, type None
+  lag1.1 is up
+    Network-instance: mac-vrf-1
+    Encapsulation   : null
+    Type            : bridged
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+==========================================================================================================================================================================
+--{ running }--[  ]--
+A:leaf1# show lag lag1 lacp-state
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+LACP State for lag1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Lag Id         : lag1
+Interval       : SLOW
+Mode           : ACTIVE
+System Id      : 00:00:00:00:00:11
+System Priority: 11
++---------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+
+|    Members    |  Oper state  |   Activity   |   Timeout    |    State     |  System Id   |   Oper key   |  Partner Id  | Partner Key  |   Port No    | Partner Port |
+|               |              |              |              |              |              |              |              |              |              |      No      |
++===============+==============+==============+==============+==============+==============+==============+==============+==============+==============+==============+
+| ethernet-1/11 | up           | ACTIVE       | LONG         | IN_SYNC/True | 00:00:00:00: | 11           | AA:C1:AB:2F: | 15           | 1            | 1            |
+|               |              |              |              | /True/True   | 00:11        |              | 14:08        |              |              |              |
++---------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+```
+
+The LAG status, network-instance is seen in the `show interface lag1` output. The `show lag lag1 lacp-state` shows the LACP parameters as well as the member ports' state information. The outputs are expected to be the same in leaf1 and leaf2 except from the 'Partner Port No' which is unique per peer.
+
+To see the ES details:
+
+```
+
+```
 
 
 
