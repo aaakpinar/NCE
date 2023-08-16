@@ -89,7 +89,7 @@ enter candidate
     /interface lag1 {
         admin-state enable
         vlan-tagging true
-        subinterface 1 {
+        subinterface 0 {
             type bridged
             vlan {
                 encap {
@@ -113,7 +113,7 @@ enter candidate
 commit now
 ```
 
-The lag1 is created with the `vlan-tagging` enabled so that this LAG can have multiple subinterfaces with different VLAN tags. In this way, each subinterface can be attached to a different MAC-VRF. The subinterface 1 is created here with `untagged` (tag0) encapsulation.
+The lag1 is created with the `vlan-tagging` enabled so that this LAG can have multiple subinterfaces with different VLAN tags. In this way, each subinterface can be attached to a different MAC-VRF. The subinterface 0 is created here with `untagged` (tag0) encapsulation.
 
 The `lag type` can be LACP or static. Here it is configured as LACP, so its parameters must match in all nodes, leaf1 and leaf2 in this example.
 
@@ -165,12 +165,12 @@ Besides the ethernet segments, the `bgp-vpn` with `bgp-instance 1` is configured
 
 ### MAC-VRF Interface Configuration
 
-Typically, an L2 multi-homed LAG needs to be associated with a MAC-VRF.
+Typically, an L2 multi-homed LAG subinterface needs to be associated with a MAC-VRF.
 
 ```
 enter candidate
     /network-instance mac-vrf-1 {
-        interface lag1.1 {
+        interface lag1.0 {
         }
     }
 commit now
