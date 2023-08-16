@@ -20,9 +20,10 @@ tags:
 | **Version information**[^1]    | [`containerlab:0.42.0`][clab-install], [`srlinux:23.3.2`][srlinux-container], [`docker-ce:23.0.3`][docker-install]                                                                                                                                                                                                                                                                                                                                                                        |
 
 One of the many advantages of EVPN is its built-in multi-homing (MH) capability, which is standards-based and defined by RFCs 7432, 8365. 
-EVPN provides multi-homing with the Ethernet Segments (ES). ES simply defines all the links from a multi-homed CE to multiple PEs.
 
-This tutorial will show how to configure multi-homing for a CE connected to multiple PEs in an EVPN-based SR Linux fabric.
+This tutorial will show the configuration items of L2 multi-homing provided by multiple PEs in an EVPN-based SR Linux fabric.
+
+EVPN provides multi-homing with the Ethernet Segments (ES), which may be a new concept to some of the readers. Therefore, the terminology will also be discussed in the following chapters.
 
 The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine Linux hosts(CEs). A multi-homed CE is connected to leaf1, while another CE is connected to leaf3 for testing purposes.
 
@@ -45,35 +46,43 @@ Before diving into the hands-on, I'll mention the terms that would help better u
 
 + **MAC-VRF:** A broadcast domain in SR Linux.
 
-+ **Multi-homing Modes:** There are two modes defined by the standard; single-active and all-active. The single-active has only one active link while all-active uses all links and provides load balancing. An example of all-active multi-homing will be covered in this tutorial.
-![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-all-active.svg)
-  
-+ **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. Each ES has a unique identifier (ESI) advertised via EVPN. It is used for load-balancing, preventing loops and duplicates for multi-homed workloads.
++ **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. An ES is configured in all PEs that a CE is connected and has a unique identifier (ESI) advertised via EVPN.
 
 ![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/esi.svg)
 
-+ **Link Aggregation Group (LAG):** A LAG is needed for all-active but optional for single-active multi-homing.
++ **Multi-homing Modes:** The standard defines two modes: single-active and all-active. Single-active mode has only one active link, while all-active mode uses all links and provides load balancing. This tutorial covers an example of all-active multi-homing.
+![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-all-active.svg)
+
++ **Link Aggregation Group (LAG):** A LAG is required for all-active but optional for single-active multi-homing.
+
+The following procedures are essential to EVPN multi-homing but not a typical configuration item;
+
++ Designated Forwarder (DF): The leaf that is elected to forward BUM traffic. The election is based on the route-type 4 (RT4) exchange, known as the ES routes of EVPN.
++ Split-horizon (Local bias): A mechanism to avoid looping the BUM traffic received from the CE back to itself by a peer PE. Local bias is used for all-active and based on RT4 exchange. 
++ Aliasing: For remote PEs that are not part of ES to load-balance traffic to the multi-homed CE. RT1 (Auto-discovery) is advertised for aliasing.
+
+EVPN route types 1 and 4 are used to implement the multi-homing procedures.
 
 ## SR Linux Multi-Homing Configurations
 
-The below items are to be configured in all PEs that provide multi-homing to a CE.
+The following items must be configured in all PEs that provide multi-homing to a CE.
 
 + A LAG and member interfaces
 + Ethernet segment
 + MAC-VRF to interface association
 
 The lab is pre-configured with underlay, EVPN routing with BGP, and a MAC-VRF for CE-to-CE L2 communication.
-  >Check out _[L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf) to learn more about the configured part!_ 
+  >Check out _[L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf) to learn more about the pre-configured part!_ 
 
 ### LAG Configuration
 
 LAG is required for the all-active mode but can be skipped for single-active cases.
 
-In this example, a LAG is created for an all-active multi-homing mode. The target configuration between a multihomed CE and PEs is illustrated below.
+In this example, a LAG is created for an all-active multi-homing mode. The target configuration between a multihomed CE and PEs is shown below.
 
 **IMAGE LAG HERE**
 
-The configuration snippet below shows a LAG with a subinterface and LACP parameters of it.
+The configuration snippet below shows a LAG with a subinterface and its LACP settings.
 
 ```
 enter candidate
@@ -103,11 +112,11 @@ enter candidate
     }
 ```
 
-The lag1 is created with the `vlan-tagging` enabled so that this LAG can have multiple subinterfaces with different VLAN tags. In this way, each subinterface can be attached to a different MAC-VRF. The subinterface 1 is created with `untagged` (tag0) encapsulation here.
+The lag1 is created with the `vlan-tagging` enabled so that this LAG can have multiple subinterfaces with different VLAN tags. In this way, each subinterface can be attached to a different MAC-VRF. The subinterface 1 is created here with `untagged` (tag0) encapsulation.
 
-The `lag-type` can be LACP or static. It is configured as LACP here, so its parameters must match in all nodes, leaf1, and leaf2 in this example.
+The `lag type` can be LACP or static. Here it is configured as LACP, so its parameters must match in all nodes, leaf1 and leaf2 in this example.
 
-Then, the physical interface(s) must be associated with the LAG. 
+And associate the physical interface(s) with the LAG to complete this part. 
 
 ```
 enter candidate
@@ -119,7 +128,7 @@ enter candidate
     }
 ```
 
-The LAG and interface configurations must be done in all PEs that provide multi-homing to the CE.
+All PEs that offer a multi-homing to a CE must be configured similarly with the lag and interface configurations.
 
 ### Ethernet Segment Configuration
 
@@ -147,7 +156,7 @@ enter candidate
     }
 ```
 
-An `ethernet-segment` is created with a name (ES-1) under the BGP-instance 1. The ES identifier (esi) and the `multi-homing-mode` must match in all leaf routers. At last, we associate the `lag1` interface with the ES-1.
+An `ethernet-segment` is created with a name (ES-1) under the BGP-instance 1. The ES identifier (`esi`) and the `multi-homing-mode` must match in all leaf routers. At last, we associate the `lag1` interface with the ES-1.
 
 Besides the ethernet segments, the `bgp-vpn` with `bgp-instance 1` is configured to get the ES routes' BGP information (RT/RD).
 
@@ -197,7 +206,7 @@ bond-miimon 300
 mtu 1400
 ```
 
-Similarly, ce2 is configured with an IP address but, without bonding:
+Similarly, ce2 is configured with an IP address but without bonding:
 
 ```
 auto eth1
