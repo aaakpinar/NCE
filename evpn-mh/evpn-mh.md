@@ -61,7 +61,7 @@ The following procedures are essential to EVPN multi-homing but not a typical co
 + **Split-horizon (Local bias):** A mechanism to avoid looping the BUM traffic received from the CE back to itself by a peer PE. Local bias is used for all-active and based on RT4 exchange. 
 + **Aliasing:** For remote PEs that are not part of ES to load-balance traffic to the multi-homed CE. RT1 (Auto-discovery) is advertised for aliasing.
 
-EVPN route types 1 and 4 are used to implement the multi-homing procedures.
+EVPN route types 1 and 4 are used to implement the multi-homing procedures. More on the EVPN procedures and route-types [here](https://documentation.nokia.com/srlinux/23-3/books/evpn-vxlan/evpn-vxlan-tunnels-layer-2.html?hl=designated%2Cforwarder#evpn-l2-multi-hom-procedures)...
 
 ## SR Linux Multi-Homing Configurations
 
