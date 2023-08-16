@@ -44,8 +44,6 @@ The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine Linux hosts(CEs).
 
 Before diving into the hands-on, I'll mention the terms that would help better understand the configurations.
 
-+ **MAC-VRF:** A broadcast domain in SR Linux.
-
 + **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. An ES is configured in all PEs that a CE is connected and has a unique identifier (ESI) advertised via EVPN.
 
 ![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/esi.svg)
@@ -55,11 +53,13 @@ Before diving into the hands-on, I'll mention the terms that would help better u
 
 + **Link Aggregation Group (LAG):** A LAG is required for all-active but optional for single-active multi-homing.
 
++ **MAC-VRF:** A broadcast domain in SR Linux. Interface(s) or LAG must be attached to a MAC-VRF for L2 multi-homing.
+
 The following procedures are essential to EVPN multi-homing but not a typical configuration item;
 
-+ Designated Forwarder (DF): The leaf that is elected to forward BUM traffic. The election is based on the route-type 4 (RT4) exchange, known as the ES routes of EVPN.
-+ Split-horizon (Local bias): A mechanism to avoid looping the BUM traffic received from the CE back to itself by a peer PE. Local bias is used for all-active and based on RT4 exchange. 
-+ Aliasing: For remote PEs that are not part of ES to load-balance traffic to the multi-homed CE. RT1 (Auto-discovery) is advertised for aliasing.
++ **Designated Forwarder (DF):** The leaf that is elected to forward BUM traffic. The election is based on the route-type 4 (RT4) exchange, known as the ES routes of EVPN.
++ **Split-horizon (Local bias):** A mechanism to avoid looping the BUM traffic received from the CE back to itself by a peer PE. Local bias is used for all-active and based on RT4 exchange. 
++ **Aliasing:** For remote PEs that are not part of ES to load-balance traffic to the multi-homed CE. RT1 (Auto-discovery) is advertised for aliasing.
 
 EVPN route types 1 and 4 are used to implement the multi-homing procedures.
 
@@ -69,7 +69,7 @@ The following items must be configured in all PEs that provide multi-homing to a
 
 + A LAG and member interfaces
 + Ethernet segment
-+ MAC-VRF to interface association
++ MAC-VRF interface association
 
 The lab is pre-configured with underlay, EVPN routing with BGP, and a MAC-VRF for CE-to-CE L2 communication.
   >Check out _[L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf) to learn more about the pre-configured part!_ 
