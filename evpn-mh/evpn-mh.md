@@ -110,6 +110,7 @@ enter candidate
             }
         }
     }
+commit now
 ```
 
 The lag1 is created with the `vlan-tagging` enabled so that this LAG can have multiple subinterfaces with different VLAN tags. In this way, each subinterface can be attached to a different MAC-VRF. The subinterface 1 is created here with `untagged` (tag0) encapsulation.
@@ -120,12 +121,13 @@ And associate the physical interface(s) with the LAG to complete this part.
 
 ```
 enter candidate
-    /interface ethernet-1/11 {
+    /interface ethernet-1/1 {
         admin-state enable
         ethernet {
             aggregate-id lag1
         }
     }
+commit now
 ```
 
 All PEs that offer a multi-homing to a CE must be configured similarly with the lag and interface configurations.
@@ -154,6 +156,7 @@ enter candidate
         bgp-instance 1 {
         }
     }
+commit now
 ```
 
 An `ethernet-segment` is created with a name (ES-1) under the BGP-instance 1. The ES identifier (`esi`) and the `multi-homing-mode` must match in all leaf routers. At last, we associate the `lag1` interface with the ES-1.
@@ -170,6 +173,7 @@ enter candidate
         interface lag1.1 {
         }
     }
+commit now
 ```
 
 Also, to enable load-balancing to all-active multi-homing segments, set ecmp to the expected number of leaf (PE) that serves the CE, 2 in this example.
@@ -185,6 +189,7 @@ enter candidate
             }
         }
     }
+commit now
 ```
 
 The whole MAC-VRF with VXLAN configuration is covered [here](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf).
