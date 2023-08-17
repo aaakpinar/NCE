@@ -21,7 +21,7 @@ tags:
 
 One of the many advantages of EVPN is its built-in multi-homing (MH) capability, which is standards-based and defined by RFCs 7432, 8365. 
 
-This tutorial will learn how to configure an L2 multi-homed CE connected to multiple PEs in an EVPN-based SR Linux fabric.
+This tutorial will help you learn about L2 multi-homing with EVPN and guide you on how to configure it in an EVPN-based SR Linux fabric.
 
 EVPN provides multi-homing with the Ethernet Segments (ES), which may be a new concept to some readers. Therefore, the terminology will also be discussed in the following chapters.
 
