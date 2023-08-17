@@ -21,11 +21,11 @@ tags:
 
 One of the many advantages of EVPN is its built-in multi-homing (MH) capability, which is standards-based and defined by RFCs 7432, 8365. 
 
-This tutorial will show the configuration items of L2 multi-homing provided by multiple PEs in an EVPN-based SR Linux fabric.
+This tutorial will learn how to configure an L2 multi-homed CE connected to multiple PEs in an EVPN-based SR Linux fabric.
 
-EVPN provides multi-homing with the Ethernet Segments (ES), which may be a new concept to some of the readers. Therefore, the terminology will also be discussed in the following chapters.
+EVPN provides multi-homing with the Ethernet Segments (ES), which may be a new concept to some readers. Therefore, the terminology will also be discussed in the following chapters.
 
-The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine Linux hosts(CEs). A multi-homed CE is connected to leaf1, while another CE is connected to leaf3 for testing purposes.
+The lab comprises a spine, three leaf(PEs) routers, and two Alpine Linux hosts(CEs). A multi-homed CE is connected to leaf1, while another is linked to leaf3 for testing purposes.
 
 <div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:0,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-fabric.svg&quot;}"></div>
 
@@ -33,12 +33,110 @@ The lab comprises a spine, 3 leaf(PEs) routers, and two Alpine Linux hosts(CEs).
 
 ## Lab deployment
 
+As usual, this lab is powered by containerlab and can be deployed on any Linux VM with enough resources mentioned in the table at the beginning.
 
+This lab comes with pre-configurations that are explained in [L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf), which is highly recommended if you haven't played with SR Linux or EVPN yet.
 
+The topology and pre-configurations are defined in the containerlab topology file.
 
+The SR Linux configurations are referred to as [config files][configs] (.cfg), and Alpine Linux configurations are defined in the [topology file][topofile] to be directly executed at the deployment.
 
+```yaml
+--8<-- "labs/evpn-mh/evpn-mh01.clab.yml"
+```
 
+The SR Linux configurations are 
 
+```yaml
+--8<-- "labs/evpn-mh/leaf1.cfg"
+```
+```yaml
+--8<-- "labs/evpn-mh/leaf2.cfg"
+```
+```yaml
+--8<-- "labs/evpn-mh/leaf3.cfg"
+```
+```yaml
+--8<-- "labs/evpn-mh/spine1.cfg"
+```
+
+Save[^2] theese to your Linux machine and deploy:
+
+```
+# containerlab deploy -t evpn-mh01.clab.yml
+[root@clab-vm1 evpn-mh01]# containerlab deploy
+INFO[0000] Containerlab v0.44.0 started
+INFO[0000] Parsing & checking topology file: evpn-mh01.clab.yml
+INFO[0000] Creating docker network: Name="clab", IPv4Subnet="172.20.20.0/24", IPv6Subnet="2001:172:20:20::/64", MTU="1500"
+WARN[0000] Unable to load kernel module "ip_tables" automatically "load ip_tables failed: exec format error"
+INFO[0000] Creating lab directory: /root/demo/learn.srlinux/clab/evpn-mh01/clab-evpn-mh01
+WARN[0000] SSH_AUTH_SOCK not set, skipping pubkey fetching
+INFO[0000] Creating container: "ce2"
+INFO[0000] Creating container: "ce1"
+INFO[0000] Creating container: "spine1"
+INFO[0000] Creating container: "leaf3"
+INFO[0000] Creating container: "leaf1"
+INFO[0000] Creating container: "leaf2"
+INFO[0003] Creating link: leaf1:e1-49 <--> spine1:e1-1
+INFO[0003] Creating link: ce1:eth1 <--> leaf1:e1-1
+INFO[0003] Creating link: leaf3:e1-49 <--> spine1:e1-3
+INFO[0003] Creating link: leaf2:e1-49 <--> spine1:e1-2
+INFO[0003] Creating link: ce2:eth1 <--> leaf3:e1-1
+INFO[0003] Creating link: ce1:eth2 <--> leaf2:e1-1
+INFO[0004] Creating link: ce2:eth2 <--> leaf3:e1-2
+INFO[0004] Creating link: ce2:eth3 <--> leaf3:e1-3
+INFO[0004] Running postdeploy actions for Nokia SR Linux 'leaf3' node
+INFO[0004] Running postdeploy actions for Nokia SR Linux 'leaf1' node
+INFO[0004] Running postdeploy actions for Nokia SR Linux 'spine1' node
+INFO[0004] Running postdeploy actions for Nokia SR Linux 'leaf2' node
+INFO[0025] Adding containerlab host entries to /etc/hosts file
+INFO[0026] Executed command "ip link add bond0 type bond mode 802.3ad" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set address 00:c1:ab:00:00:11 dev bond0" on the node "ce1". stdout:
+INFO[0026] Executed command "ip addr add 192.168.0.11/24 dev bond0" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set eth1 down" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set eth2 down" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set eth1 master bond0" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set eth2 master bond0" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set eth1 up" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set eth2 up" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set bond0 up" on the node "ce1". stdout:
+INFO[0026] Executed command "ip link set address 00:c1:ab:00:00:21 dev eth1" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link set address 00:c1:ab:00:00:22 dev eth2" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link set address 00:c1:ab:00:00:23 dev eth3" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link add dev vrf-1 type vrf table 1" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link set dev vrf-1 up" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link set dev eth1 master vrf-1" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link add dev vrf-2 type vrf table 2" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link set dev vrf-2 up" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link set dev eth2 master vrf-2" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link add dev vrf-3 type vrf table 3" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link set dev vrf-3 up" on the node "ce2". stdout:
+INFO[0026] Executed command "ip link set dev eth3 master vrf-3" on the node "ce2". stdout:
+INFO[0026] Executed command "ip addr add 192.168.0.21/24 dev eth1" on the node "ce2". stdout:
+INFO[0026] Executed command "ip addr add 192.168.0.22/24 dev eth2" on the node "ce2". stdout:
+INFO[0026] Executed command "ip addr add 192.168.0.23/24 dev eth3" on the node "ce2". stdout:
++---+-----------------------+--------------+------------------------------+-------+---------+----------------+----------------------+
+| # |         Name          | Container ID |            Image             | Kind  |  State  |  IPv4 Address  |     IPv6 Address     |
++---+-----------------------+--------------+------------------------------+-------+---------+----------------+----------------------+
+| 1 | clab-evpn-mh01-ce1    | 11d8ad808671 | akpinar/alpine:latest        | linux | running | 172.20.20.2/24 | 2001:172:20:20::2/64 |
+| 2 | clab-evpn-mh01-ce2    | f563402d339f | akpinar/alpine:latest        | linux | running | 172.20.20.7/24 | 2001:172:20:20::7/64 |
+| 3 | clab-evpn-mh01-leaf1  | dfcf20665a6a | ghcr.io/nokia/srlinux:23.3.1 | srl   | running | 172.20.20.4/24 | 2001:172:20:20::4/64 |
+| 4 | clab-evpn-mh01-leaf2  | fee169425f04 | ghcr.io/nokia/srlinux:23.3.1 | srl   | running | 172.20.20.6/24 | 2001:172:20:20::6/64 |
+| 5 | clab-evpn-mh01-leaf3  | 115bbac271c9 | ghcr.io/nokia/srlinux:23.3.1 | srl   | running | 172.20.20.5/24 | 2001:172:20:20::5/64 |
+| 6 | clab-evpn-mh01-spine1 | d825b06fe483 | ghcr.io/nokia/srlinux:23.3.1 | srl   | running | 172.20.20.3/24 | 2001:172:20:20::3/64 |
++---+-----------------------+--------------+------------------------------+-------+---------+----------------+----------------------+
+```
+
+A few seconds later containerlab finishes the deployment with providing a summary table that outlines connection details of the deployed nodes. In the "Name" column we have the names of the deployed containers and those names can be used to reach the nodes, for example to connect to the SSH of `leaf1`:
+
+```bash
+# default credentials admin:NokiaSrl1!
+ssh admin@clab-evpn01-leaf1
+```
+
+To connect Alpine Linux (CEs):
+
+=== "srv1" docker exec -it clab-evpn-mh01-ce1 bash === "srv2" docker exec -it clab-evpn-mh01-ce2 bash
 
 ## EVPN Multi-homing Terminology
 
@@ -200,41 +298,12 @@ Let's see the configuration example on the CE side.
 
 ## CE (Alpine Linux) Configuration
 
-The ce2 is configured with a bond0 with slave interfaces eth1 and eth2. Similar to SR Linux part, it's configured with LACP (802.3ad).
+The ce1 has multi-homed bond0 with slave interfaces eth1 and eth2. Similar to SR Linux part, it's configured with LACP (802.3ad). 
 
-The configuration file is /etc/network/interfaces and an example configuration snippet is below:
+The single homed ce1 has multiple interfaces to a single PE (leaf3). Those interfaces are placed in different VRFs so that ce2 can simulate multiple remote endpoints.
+This is primarily to get better enthropy for load-balancing so that you can observe ce1 using both active links.
 
-```
-auto bond0
-auto eth1
-auto eth2
-
-iface eth1 inet manual
-bond-master bond0
-mtu 1400
-
-iface eth2 inet manual
-bond-master bond0
-mtu 1400
-
-iface bond0 inet static
-address 100.101.1.11
-netmask 255.255.255.0
-bond-mode 802.3ad
-bond-xmit-hash-policy layer3+4
-bond-miimon 300
-mtu 1400
-```
-
-Similarly, ce2 is configured with an IP address but without bonding:
-
-```
-auto eth1
-iface eth1 inet static
-address 100.101.1.14
-netmask 255.255.255.0
-mtu 1400
-```
+> See the containerlab topology file for the CE configurations.
 
 ## Verifying the Multi-homing
 
@@ -354,14 +423,65 @@ Type 4 Ethernet Segment Routes
 0 advertised IP Prefix routes
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
-
+```
+A:leaf2# show network-instance default protocols bgp neighbor 10.0.0.1 advertised-routes evpn
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+Peer        : 10.0.0.1, remote AS: 100, local AS: 100
+Type        : static
+Description : None
+Group       : iBGP-overlay
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+Origin codes: i=IGP, e=EGP, ?=incomplete
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+Type 1 Ethernet Auto-Discovery Routes
++----------------------+--------------------------------+------------+----------------------+----------------------+---------+----------------------+
+| Route-distinguisher  |              ESI               |   Tag-ID   |       Next-Hop       |         MED          | LocPref |         Path         |
++======================+================================+============+======================+======================+=========+======================+
+| 10.0.0.2:111         | 01:11:11:11:11:11:11:00:00:01  | 0          | 10.0.0.2             | -                    | 100     |                      |
+| 10.0.0.2:111         | 01:11:11:11:11:11:11:00:00:01  | 4294967295 | 10.0.0.2             | -                    | 100     |                      |
++----------------------+--------------------------------+------------+----------------------+----------------------+---------+----------------------+
+Type 2 MAC-IP Advertisement Routes
++--------------------+------------+-------------------+--------------------+--------------------+--------------------+---------+--------------------+
+|       Route-       |   Tag-ID   |    MAC-address    |     IP-address     |      Next-Hop      |        MED         | LocPref |        Path        |
+|   distinguisher    |            |                   |                    |                    |                    |         |                    |
++====================+============+===================+====================+====================+====================+=========+====================+
+| 10.0.0.2:111       | 0          | 00:C1:AB:00:00:11 | 0.0.0.0            | 10.0.0.2           | -                  | 100     |                    |
++--------------------+------------+-------------------+--------------------+--------------------+--------------------+---------+--------------------+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+Type 3 Inclusive Multicast Ethernet Tag Routes
++------------------------+------------+---------------------+------------------------+------------------------+---------+------------------------+
+|  Route-distinguisher   |   Tag-ID   |    Originator-IP    |        Next-Hop        |          MED           | LocPref |          Path          |
++========================+============+=====================+========================+========================+=========+========================+
+| 10.0.0.2:111           | 0          | 10.0.0.2            | 10.0.0.2               | -                      | 100     |                        |
++------------------------+------------+---------------------+------------------------+------------------------+---------+------------------------+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+Type 4 Ethernet Segment Routes
++--------------------+--------------------------------+--------------------+--------------------+--------------------+---------+--------------------+
+|       Route-       |              ESI               |   Originating-IP   |      Next-Hop      |        MED         | LocPref |        Path        |
+|   distinguisher    |                                |                    |                    |                    |         |                    |
++====================+================================+====================+====================+====================+=========+====================+
+| 10.0.0.2:0         | 01:11:11:11:11:11:11:00:00:01  | 10.0.0.2           | 10.0.0.2           | -                  | 100     |                    |
++--------------------+--------------------------------+--------------------+--------------------+--------------------+---------+--------------------+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+2 advertised Ethernet Auto-Discovery routes
+1 advertised MAC-IP Advertisement routes
+1 advertised Inclusive Multicast Ethernet Tag routes
+1 advertised Ethernet Segment routes
+0 advertised IP Prefix routes
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+```
 There are RT1, RT3 and RT4 routes and as soon as some traffic is sent from CEs, RT2 (MAC-IP Advertisements) routes will appear. 
 Among those, RT4 is known as ES routes which imported by ES peers for DF election and local biasing (split-horizon). Only between leaf1 and leaf2 in this example. 
+
 RT1 advertises ESIs as well, basically for two reasons(that's why two entries per ESI); 
 + Aliasing to provide load-balancing (0) 
 + Mass withdrawal for fast convergence (4294967295)
 
-The leaf 2 
+Let's see what leaf2 and leaf3 gets their BGP EVPN route table:
+
+Leaf 2 
 ```
 A:leaf2# show network-instance default protocols bgp routes evpn route-type summary
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -416,53 +536,84 @@ Type 4 Ethernet Segment Routes
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
-
-
-The leaf 3
-
+Leaf 3
 ```
-A:leaf3# show network-instance default protocols bgp neighbor 10.0.0.1 received-routes evpn
------------------------------------------------------------------------------------------------------------------------------------------------------------
-Peer        : 10.0.0.1, remote AS: 100, local AS: 100
-Type        : static
-Description : None
-Group       : iBGP-overlay
------------------------------------------------------------------------------------------------------------------------------------------------------------
+A:leaf3# show network-instance default protocols bgp routes evpn route-type summary
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Show report for the BGP route table of network-instance "default"
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Status codes: u=used, *=valid, >=best, x=stale
 Origin codes: i=IGP, e=EGP, ?=incomplete
------------------------------------------------------------------------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+BGP Router ID: 10.0.0.3      AS: 103      Local AS: 103
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Type 1 Ethernet Auto-Discovery Routes
-+--------+---------------------+--------------------------------+------------+---------------------+---------------------+---------+---------------------+
-| Status | Route-distinguisher |              ESI               |   Tag-ID   |      Next-Hop       |         MED         | LocPref |        Path         |
-+========+=====================+================================+============+=====================+=====================+=========+=====================+
-| u*>    | 10.0.0.1:111        | 01:11:11:11:11:11:11:00:00:01  | 0          | 10.0.0.1            | -                   | 100     |                     |
-| u*>    | 10.0.0.1:111        | 01:11:11:11:11:11:11:00:00:01  | 4294967295 | 10.0.0.1            | -                   | 100     |                     |
-+--------+---------------------+--------------------------------+------------+---------------------+---------------------+---------+---------------------+
++--------+-------------------------+--------------------------------+------------+-------------------------+-------------------------+-------------------------+
+| Status |   Route-distinguisher   |              ESI               |   Tag-ID   |        neighbor         |        Next-hop         |           VNI           |
++========+=========================+================================+============+=========================+=========================+=========================+
+| u*>    | 10.0.0.1:111            | 01:11:11:11:11:11:11:00:00:01  | 0          | 10.0.0.1                | 10.0.0.1                | 1                       |
+| u*>    | 10.0.0.1:111            | 01:11:11:11:11:11:11:00:00:01  | 4294967295 | 10.0.0.1                | 10.0.0.1                | -                       |
+| u*>    | 10.0.0.2:111            | 01:11:11:11:11:11:11:00:00:01  | 0          | 10.0.0.2                | 10.0.0.2                | 1                       |
+| u*>    | 10.0.0.2:111            | 01:11:11:11:11:11:11:00:00:01  | 4294967295 | 10.0.0.2                | 10.0.0.2                | -                       |
++--------+-------------------------+--------------------------------+------------+-------------------------+-------------------------+-------------------------+
 Type 2 MAC-IP Advertisement Routes
-+--------+-------------------+------------+-------------------+-------------------+-------------------+-------------------+---------+-------------------+
-| Status |      Route-       |   Tag-ID   |    MAC-address    |    IP-address     |     Next-Hop      |        MED        | LocPref |       Path        |
-|        |   distinguisher   |            |                   |                   |                   |                   |         |                   |
-+========+===================+============+===================+===================+===================+===================+=========+===================+
-| u*>    | 10.0.0.1:111      | 0          | 00:C1:AB:00:00:11 | 0.0.0.0           | 10.0.0.1          | -                 | 100     |                   |
-+--------+-------------------+------------+-------------------+-------------------+-------------------+-------------------+---------+-------------------+
------------------------------------------------------------------------------------------------------------------------------------------------------------
++-------+--------------+-----------+-----------------+--------------+--------------+--------------+--------------+-----------------------------+--------------+
+| Statu | Route-distin |  Tag-ID   |   MAC-address   |  IP-address  |   neighbor   |   Next-Hop   |     VNI      |             ESI             | MAC Mobility |
+|   s   |   guisher    |           |                 |              |              |              |              |                             |              |
++=======+==============+===========+=================+==============+==============+==============+==============+=============================+==============+
+| u*>   | 10.0.0.1:111 | 0         | 00:C1:AB:00:00: | 0.0.0.0      | 10.0.0.1     | 10.0.0.1     | 1            | 01:11:11:11:11:11:11:00:00: | -            |
+|       |              |           | 11              |              |              |              |              | 01                          |              |
+| u*>   | 10.0.0.2:111 | 0         | 00:C1:AB:00:00: | 0.0.0.0      | 10.0.0.2     | 10.0.0.2     | 1            | 01:11:11:11:11:11:11:00:00: | -            |
+|       |              |           | 11              |              |              |              |              | 01                          |              |
++-------+--------------+-----------+-----------------+--------------+--------------+--------------+--------------+-----------------------------+--------------+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Type 3 Inclusive Multicast Ethernet Tag Routes
-+--------+------------------------+------------+---------------------+------------------------+------------------------+---------+------------------------+
-| Status |  Route-distinguisher   |   Tag-ID   |    Originator-IP    |        Next-Hop        |          MED           | LocPref |          Path          |
-+========+========================+============+=====================+========================+========================+=========+========================+
-| u*>    | 10.0.0.1:111           | 0          | 10.0.0.1            | 10.0.0.1               | -                      | 100     |                        |
-+--------+------------------------+------------+---------------------+------------------------+------------------------+---------+------------------------+
------------------------------------------------------------------------------------------------------------------------------------------------------------
-2 Ethernet Auto-Discovery routes 2 used, 2 valid
-1 MAC-IP Advertisement routes 1 used, 1 valid
-1 Inclusive Multicast Ethernet Tag routes 1 used, 1 valid
++--------+--------------------------------------+------------+---------------------+--------------------------------------+--------------------------------------+
+| Status |         Route-distinguisher          |   Tag-ID   |    Originator-IP    |               neighbor               |               Next-Hop               |
++========+======================================+============+=====================+======================================+======================================+
+| u*>    | 10.0.0.1:111                         | 0          | 10.0.0.1            | 10.0.0.1                             | 10.0.0.1                             |
+| u*>    | 10.0.0.2:111                         | 0          | 10.0.0.2            | 10.0.0.2                             | 10.0.0.2                             |
++--------+--------------------------------------+------------+---------------------+--------------------------------------+--------------------------------------+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+4 Ethernet Auto-Discovery routes 4 used, 4 valid
+2 MAC-IP Advertisement routes 2 used, 2 valid
+2 Inclusive Multicast Ethernet Tag routes 2 used, 2 valid
 0 Ethernet Segment routes 0 used, 0 valid
 0 IP Prefix routes 0 used, 0 valid
------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ```
 
+Leaf 2, as a ES peer, gets both RT1 and RT4 in its table while Leaf3, the remote PE only imports RT1.
 
+At last, verify the MAC table of the "mac-vrf-1" on Leaf3 which should show the 'esi' instead of an individual destination for the ce1's MAC address.
+
+```
+A:leaf3# show network-instance mac-vrf-1 bridge-table mac-table all
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+Mac-table of network instance mac-vrf-1
+-----------------------------------------------------------------------------------------------------------------------------------------------------
++--------------------+---------------------------------------+------------+------------+---------+--------+---------------------------------------+
+|      Address       |              Destination              | Dest Index |    Type    | Active  | Aging  |              Last Update              |
++====================+=======================================+============+============+=========+========+=======================================+
+| 00:C1:AB:00:00:11  | vxlan-interface:vxlan1.1              | 7173081172 | evpn       | true    | N/A    | 2023-08-17T10:34:59.000Z              |
+|                    | esi:01:11:11:11:11:11:11:00:00:01     | 20         |            |         |        |                                       |
+| 00:C1:AB:00:00:21  | ethernet-1/1.0                        | 3          | learnt     | true    | 300    | 2023-08-17T10:34:59.000Z              |
+| 00:C1:AB:00:00:22  | ethernet-1/2.0                        | 4          | learnt     | true    | 300    | 2023-08-17T10:35:01.000Z              |
+| 00:C1:AB:00:00:23  | ethernet-1/3.0                        | 5          | learnt     | true    | 300    | 2023-08-17T10:35:03.000Z              |
++--------------------+---------------------------------------+------------+------------+---------+--------+---------------------------------------+
+Total Irb Macs                 :    0 Total    0 Active
+Total Static Macs              :    0 Total    0 Active
+Total Duplicate Macs           :    0 Total    0 Active
+Total Learnt Macs              :    3 Total    3 Active
+Total Evpn Macs                :    1 Total    1 Active
+Total Evpn static Macs         :    0 Total    0 Active
+Total Irb anycast Macs         :    0 Total    0 Active
+Total Proxy Antispoof Macs     :    0 Total    0 Active
+Total Reserved Macs            :    0 Total    0 Active
+Total Eth-cfm Macs             :    0 Total    0 Active
+--{ running }--[  ]--
+```
 
 
 
@@ -491,7 +642,20 @@ The tutorial will consist of the following major parts:
 
 ## Lab deployment
 
-To let you follow along the configuration steps of this tutorial we created a lab that you can deploy on any Linux VM:
+As usual, this lab is powered by containerlab and can be deployed on any Linux VM that has enough resources mentioned in the table at begining.
+
+This lab comes with pre-configurations that are explained in [L2 EVPN tutorial](https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf), which is highly recommended if you haven't played with SR Linux or EVPN yet.
+
+The topology and pre-configurations are defined in the containerlab topology file.
+
+The SR Linux configurations are referred to [config files][configs] (.cfg) and Alpine Linux configurations are defined in the [topology file][topofile] to be directly executed at the deployment.
+
+```yaml
+--8<-- "labs/evpn-mh01.clab.yml"
+```
+
+The SR Linux configurations are 
+
 
 The [containerlab file][topofile] that describes the lab topology is referenced below in full:
 
