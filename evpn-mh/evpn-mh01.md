@@ -61,7 +61,7 @@ The SR Linux configurations are
     --8<-- "labs/evpn-mh/spine1.cfg"
     ```
 
-Save[^2] theese to your Linux machine and deploy:
+Save [these][path-evpn-mh] to your Linux machine and deploy:
 
 ```
 # containerlab deploy -t evpn-mh01.clab.yml
@@ -153,10 +153,11 @@ Before diving into the hands-on, let's see some terms that would help us better 
 
 + **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. An ES is configured in all PEs that a CE is connected and has a unique identifier (ESI) advertised via EVPN.
 
-![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/esi.svg)
+<div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:1,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh.drawio&quot;}"></div>
 
 + **Multi-homing Modes:** The standard defines two modes: single-active and all-active. Single-active mode has only one active link, while all-active mode uses all links and provides load balancing. This tutorial covers an example of all-active multi-homing.
-![image](https://github.com/aaakpinar/NCE/blob/evpn-mh/evpn-mh/evpn-mh-all-active.svg)
+
+<div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:2,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh.drawio&quot;}"></div>
 
 + **Link Aggregation Group (LAG):** A LAG is required for all-active but optional for single-active multi-homing.
 
@@ -711,6 +712,6 @@ Total Eth-cfm Macs             :    0 Total    0 Active
 
 With that, we verified a working L2 EVPN multi-homing on a SR Linux fabric. 
 
-
-[configs]: https://github.com/srl-labs/learn-srlinux/blob/l2vpn-22.11-update/docs/tutorials/evpn-mh
-
+[topology]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh/
+[configs]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh/leaf1.cfg
+[path-evpn-mh]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh
