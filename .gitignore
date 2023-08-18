@@ -4,4 +4,4 @@
 # But not these files...
 !.gitignore
 !/docs
-!/lab
+!/labs
