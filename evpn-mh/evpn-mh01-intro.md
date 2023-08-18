@@ -3,7 +3,6 @@ comments: true
 tags:
   - evpn
   - multi-homing
-  - ethernet-segments
 ---
 
 <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/hellt/drawio-js@main/embed2.js" async></script>
@@ -146,8 +145,31 @@ To connect Alpine Linux (CEs):
     docker exec -it clab-evpn-mh01-ce1 bash
     ```
 
+## EVPN Multi-homing Terminology
 
+Before diving into the hands-on, let's see some terms that would help us better understand the configurations.
 
++ **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. An ES is configured in all PEs that a CE is connected and has a unique identifier (ESI) advertised via EVPN.
+
+<div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:1,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh.drawio&quot;}"></div>
+
++ **Multi-homing Modes:** The standard defines two modes: single-active and all-active. Single-active mode has only one active link, while all-active mode uses all links and provides load balancing. This tutorial covers an example of all-active multi-homing.
+
+<div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:2,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh.drawio&quot;}"></div>
+
++ **Link Aggregation Group (LAG):** A LAG is required for all-active but optional for single-active multi-homing.
+
++ **MAC-VRF:** It is the L2 network-instance, basically a broadcast domain in SR Linux. Interface(s) or LAG must be attached to a MAC-VRF for L2 multi-homing.
+
+The following procedures are essential to EVPN multi-homing but they're not one of the typical configuration items;
+
++ **Designated Forwarder (DF):** The leaf that is elected to forward BUM traffic. The election is based on the route-type 4 (RT4) exchange, known as the ES routes of EVPN.
++ **Split-horizon (Local bias):** A mechanism to avoid looping the BUM traffic received from the CE back to itself by a peer PE. Local bias is used for all-active and based on RT4 exchange. 
++ **Aliasing:** For remote PEs that are not part of ES to load-balance traffic to the multi-homed CE. RT1 (Auto-discovery) is advertised for aliasing.
+
+EVPN route types 1 and 4 are used to implement the multi-homing procedures. You can check [this](https://documentation.nokia.com/srlinux/23-3/books/evpn-vxlan/evpn-vxlan-tunnels-layer-2.html?hl=designated%2Cforwarder#evpn-l2-multi-hom-procedures) out for more about EVPN multi-homing procedures and route-types.
+
+Now, let's move on to the configuration part.
 
 [topology]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh/
 [configs]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh/leaf1.cfg

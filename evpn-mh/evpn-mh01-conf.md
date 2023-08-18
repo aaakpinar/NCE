@@ -1,40 +1,19 @@
-## EVPN Multi-homing Terminology
+---
+comments: true
+tags:
+  - multi-homing
+  - ethernet-segments
+---
 
-Before diving into the hands-on, let's see some terms that would help us better understand the configurations.
+In this part, we focus on the configurations. The target is to get the SR Linux fabric configured with the necessary configuration items for a multi-homed CE.
 
-+ **Ethernet Segment (ES):** Defines the CE links connected to multiple PEs. An ES is configured in all PEs that a CE is connected and has a unique identifier (ESI) advertised via EVPN.
-
-<div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:1,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh.drawio&quot;}"></div>
-
-+ **Multi-homing Modes:** The standard defines two modes: single-active and all-active. Single-active mode has only one active link, while all-active mode uses all links and provides load balancing. This tutorial covers an example of all-active multi-homing.
-
-<div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:2,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh.drawio&quot;}"></div>
-
-+ **Link Aggregation Group (LAG):** A LAG is required for all-active but optional for single-active multi-homing.
-
-+ **MAC-VRF:** It is the L2 network-instance, basically a broadcast domain in SR Linux. Interface(s) or LAG must be attached to a MAC-VRF for L2 multi-homing.
-
-The following procedures are essential to EVPN multi-homing but they're not one of the typical configuration items;
-
-+ **Designated Forwarder (DF):** The leaf that is elected to forward BUM traffic. The election is based on the route-type 4 (RT4) exchange, known as the ES routes of EVPN.
-+ **Split-horizon (Local bias):** A mechanism to avoid looping the BUM traffic received from the CE back to itself by a peer PE. Local bias is used for all-active and based on RT4 exchange. 
-+ **Aliasing:** For remote PEs that are not part of ES to load-balance traffic to the multi-homed CE. RT1 (Auto-discovery) is advertised for aliasing.
-
-EVPN route types 1 and 4 are used to implement the multi-homing procedures. You can check [this](https://documentation.nokia.com/srlinux/23-3/books/evpn-vxlan/evpn-vxlan-tunnels-layer-2.html?hl=designated%2Cforwarder#evpn-l2-multi-hom-procedures) out for more about EVPN multi-homing procedures and route-types.
-
-## SR Linux Multi-Homing Configurations
-
-The following items must be configured in all ES peers(PEs) that provide multi-homing to a CE. It's leaf1 and leaf2 in this tutorial.
+The following items must be configured in all ES peers(PEs) that the "ce1" is connected. It's leaf1 and leaf2 in this tutorial.
 
 + A LAG and member interfaces
 + Ethernet segment
 + MAC-VRF interface association
 
 Remember that the lab is pre-configured with [fabric underlay][fabric-underlay], [EVPN][evpn], and a [MAC-VRF][mac-vrf] for CE-to-CE L2 communication.
-
-[fabric-underlay]: https://learn.srlinux.dev/tutorials/l2evpn/fabric/
-[evpn]: https://learn.srlinux.dev/tutorials/l2evpn/evpn/
-[mac-vrf]: https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf
 
 ### LAG Configuration
 
@@ -171,6 +150,9 @@ This is primarily to get better enthropy for load-balancing so that you can obse
 
 > See the containerlab topology file for the CE configurations.
 
+[fabric-underlay]: https://learn.srlinux.dev/tutorials/l2evpn/fabric/
+[evpn]: https://learn.srlinux.dev/tutorials/l2evpn/evpn/
+[mac-vrf]: https://learn.srlinux.dev/tutorials/l2evpn/evpn/#mac-vrf
 [topology]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh/
 [configs]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh/leaf1.cfg
 [path-evpn-mh]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh

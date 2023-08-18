@@ -1,4 +1,13 @@
-## Verifying the Multi-homing
+---
+comments: true
+tags:
+  - evpn
+  - route-types
+  - multi-homing
+  - ethernet-segments
+---
+
+Here we verify the configurations made in the previous section. 
 
 On the PE side, the lag1 was created in both leaf1 and leaf2. Let's see them with these show commands:
 
