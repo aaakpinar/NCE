@@ -26,6 +26,7 @@ In this example, a LAG is created for an all-active multi-homing mode. The targe
   <figcaption>LAG between PEs and CE</figcaption>
 </figure>
 
+
 The configuration snippet below shows a LAG with a subinterface and its LACP settings. 
 >The same configurations can be copied to both leaf1 and leaf2.
 
