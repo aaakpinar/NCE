@@ -21,7 +21,10 @@ LAG is required for the all-active mode but can be skipped for single-active cas
 
 In this example, a LAG is created for an all-active multi-homing mode. The target setup between a multihomed CE and PEs is shown below.
 
-<div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:3,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh01.drawio&quot;}"></div>
+<figure markdown>
+  <div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph='{"page":3,"zoom":2,"highlight":"#0000ff","nav":true,"check-visible-state":true,"resize":true,"url":"https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh01.drawio"}'></div>
+  <figcaption>LAG between PEs and CE</figcaption>
+</figure>
 
 The configuration snippet below shows a LAG with a subinterface and its LACP settings. 
 >The same configurations can be copied to both leaf1 and leaf2.
@@ -148,7 +151,10 @@ The ce1 has multi-homed bond0 with slave interfaces eth1 and eth2. Similar to SR
 The single homed ce1 has multiple interfaces to a single PE (leaf3). Those interfaces are placed in different VRFs so that ce2 can simulate multiple remote endpoints.
 This is primarily to get better enthropy for load-balancing so that you can observe ce1 sends packets to both PEs and ECMP on the remote leaf balance traffic between leaf1 and leaf2 as depicted below.
 
-<div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph="{&quot;page&quot;:5,&quot;zoom&quot;:2,&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;check-visible-state&quot;:true,&quot;resize&quot;:true,&quot;url&quot;:&quot;https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh01.drawio&quot;}"></div>
+<figure markdown>
+  <div class="mxgraph" style="max-width:100%;border:1px solid transparent;margin:0 auto; display:block;" data-mxgraph='{"page":4,"zoom":2,"highlight":"#0000ff","nav":true,"check-visible-state":true,"resize":true,"url":"https://raw.githubusercontent.com/srl-labs/learn-srlinux/diagrams/evpn-mh01.drawio"}'></div>
+  <figcaption>CE connections to mac-vrf-1 network instance</figcaption>
+</figure>
 
 
 > See the containerlab topology file for the CE configurations.
@@ -159,3 +165,5 @@ This is primarily to get better enthropy for load-balancing so that you can obse
 [topology]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh/
 [configs]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh/leaf1.cfg
 [path-evpn-mh]: https://github.com/srl-labs/learn-srlinux/blob/main/docs/tutorials/evpn-mh
+
+<script type="text/javascript" src="https://viewer.diagrams.net/js/viewer-static.min.js" async></script>
