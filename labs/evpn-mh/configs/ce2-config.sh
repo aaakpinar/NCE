@@ -11,3 +11,6 @@ ip link set dev eth2 master vrf-2
 ip link add dev vrf-3 type vrf table 3
 ip link set dev vrf-3 up
 ip link set dev eth3 master vrf-3
+ip addr add 192.168.0.21/24 dev eth1
+ip addr add 192.168.0.22/24 dev eth2
+ip addr add 192.168.0.23/24 dev eth3
